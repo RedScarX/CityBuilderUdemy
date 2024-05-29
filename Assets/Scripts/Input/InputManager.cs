@@ -11,6 +11,9 @@ namespace CityBuilder
     {
         private Camera _mainCamera;
         [SerializeField] private LayerMask layerMask;
+        [SerializeField] private float cellSize = 3;
+        [SerializeField] private GameObject buildingPrefab;
+        
 
         private void Start()
         {
@@ -32,9 +35,17 @@ namespace CityBuilder
 
                 if (rayCast)
                 {
-                    Debug.Log(hit.point - transform.position);
+                    var position = hit.point - transform.position;
+                    // Debug.Log(CalculateGridPosition(position));
+                    // CreateBuilding(CalculateGridPosition(position));
                 }
             }
         }
+
+
+        // private void CreateBuilding(Vector3 gridPosition)
+        // {
+        //     Instantiate(buildingPrefab, gridPosition, Quaternion.identity);
+        // }
     }
 }
