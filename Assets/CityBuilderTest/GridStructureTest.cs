@@ -11,7 +11,7 @@ namespace CityBuilder.Test
         [OneTimeSetUp]
         public void Init()
         {
-            _gridStructure = new GridStructure(3);
+            _gridStructure = new GridStructure(3,100,100);
         }
 
         [Test]
