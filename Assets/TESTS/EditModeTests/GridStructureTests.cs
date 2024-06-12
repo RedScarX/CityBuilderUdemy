@@ -1,41 +1,57 @@
-using System;
-using CityBuilder;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
-namespace CityBuilder.Test
+namespace Tests
 {
-    public class GridStructureTest
+    public class GridStructureTests
     {
-        private GridStructure _gridStructure;
-
+        GridStructure structure;
         [OneTimeSetUp]
         public void Init()
         {
-            _gridStructure = new GridStructure(3,100,100);
+            structure = new GridStructure(3, 100, 100);
+        }
+        #region GridPositionTests
+        // A Test behaves as an ordinary method
+        [Test]
+        public void CalculateGridPositionPasses()
+        {
+            Vector3 position = new Vector3(0, 0, 0);
+            //Act
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
+            //Assert
+            Assert.AreEqual(Vector3.zero, returnPosition);
         }
 
         [Test]
-        public void CalculateGridPositionForZeroInput()
+        public void CalculateGridPositionFloatsPasses()
         {
-           var returnPosition =  _gridStructure.CalculateGridPosition(Vector3.zero);
-           Assert.AreEqual(Vector3.zero,returnPosition);
+
+            Vector3 position = new Vector3(2.9f, 0, 2.9f);
+            //Act
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
+            //Assert
+            Assert.AreEqual(Vector3.zero, returnPosition);
         }
+
         [Test]
-        public void CalculateGridPositionForFloatInput()
+        public void CalculateGridPositionFail()
         {
-           var returnPosition =  _gridStructure.CalculateGridPosition(new Vector3( 2.9f,0,2.6f));
-           Assert.AreEqual(Vector3.zero,returnPosition);
+
+            Vector3 position = new Vector3(3.1f, 0, 0);
+            //Act
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
+            //Assert
+            Assert.AreNotEqual(Vector3.zero, returnPosition);
         }
-        
-        [Test]
-        public void CalculateGridPositionForGreaterInput()
-        {
-           var returnPosition =  _gridStructure.CalculateGridPosition(new Vector3( 3.9f,0,2.6f));
-           Assert.AreEqual(new Vector3(3,0,0),returnPosition);
-        }
-        
-         #region GridIndexTests
+        #endregion
+
+
+        #region GridIndexTests
         //[Test]
         //public void CalculateGridIndexFromGridPosition000Passes()
         //{
@@ -78,35 +94,35 @@ namespace CityBuilder.Test
 
             Vector3 position = new Vector3(3, 0, 3);
             //Act
-            Vector3 returnPosition = _gridStructure.CalculateGridPosition(position);
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
             GameObject testGameObject = new GameObject("TestGameObject");
-            _gridStructure.PlaceStructureOnTheGrid(testGameObject, position);
+            structure.PlaceStructureOnTheGrid(testGameObject, position);
             //Assert
-            Assert.IsTrue(_gridStructure.IsCellTaken(position));
+            Assert.IsTrue(structure.IsCellTaken(position));
         }
         [Test]
-        public void PlaceStructureMinAndCheckIsTakenPasses()
+        public void PlaceStructureMINAndCheckIsTakenPasses()
         {
 
             Vector3 position = new Vector3(0, 0, 0);
             //Act
-            Vector3 returnPosition = _gridStructure.CalculateGridPosition(position);
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
             GameObject testGameObject = new GameObject("TestGameObject");
-            _gridStructure.PlaceStructureOnTheGrid(testGameObject, position);
+            structure.PlaceStructureOnTheGrid(testGameObject, position);
             //Assert
-            Assert.IsTrue(_gridStructure.IsCellTaken(position));
+            Assert.IsTrue(structure.IsCellTaken(position));
         }
         [Test]
-        public void PlaceStructureMaxAndCheckIsTakenPasses()
+        public void PlaceStructureMAXAndCheckIsTakenPasses()
         {
 
             Vector3 position = new Vector3(297, 0, 297);
             //Act
-            Vector3 returnPosition = _gridStructure.CalculateGridPosition(position);
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
             GameObject testGameObject = new GameObject("TestGameObject");
-            _gridStructure.PlaceStructureOnTheGrid(testGameObject, position);
+            structure.PlaceStructureOnTheGrid(testGameObject, position);
             //Assert
-            Assert.IsTrue(_gridStructure.IsCellTaken(position));
+            Assert.IsTrue(structure.IsCellTaken(position));
         }
 
         [Test]
@@ -115,11 +131,11 @@ namespace CityBuilder.Test
 
             Vector3 position = new Vector3(3, 0, 3);
             //Act
-            Vector3 returnPosition = _gridStructure.CalculateGridPosition(position);
+            Vector3 returnPosition = structure.CalculateGridPosition(position);
             GameObject testGameObject = null;
-            _gridStructure.PlaceStructureOnTheGrid(testGameObject, position);
+            structure.PlaceStructureOnTheGrid(testGameObject, position);
             //Assert
-            Assert.IsFalse(_gridStructure.IsCellTaken(position));
+            Assert.IsFalse(structure.IsCellTaken(position));
         }
 
         [Test]
@@ -129,7 +145,7 @@ namespace CityBuilder.Test
             Vector3 position = new Vector3(303, 0, 303);
             //Act
             //Assert
-            Assert.Throws<IndexOutOfRangeException>(()=>_gridStructure.IsCellTaken(position));
+            Assert.Throws<IndexOutOfRangeException>(()=>structure.IsCellTaken(position));
         }
 
         #endregion

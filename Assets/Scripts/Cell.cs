@@ -1,19 +1,31 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace CityBuilder
+public class Cell 
 {
-    public class Cell
+    GameObject structureModel = null;
+    bool isTaken = false;
+
+    public bool IsTaken { get => isTaken;}
+
+    public void SetConstruction(GameObject structureModel)
     {
-        private GameObject _structureModel = null;
-        public bool IsTaken { get; private set; } = false;
+        if (structureModel == null)
+            return;
+        this.structureModel = structureModel;
+        this.isTaken = true;
+    }
 
-        public void SetConstruction(GameObject structureModel)
-        {
-            if (structureModel == null) return;
+    public GameObject GetStructure()
+    {
+        return structureModel;
+    }
 
-            this._structureModel = structureModel;
-            IsTaken = true;
-            
-        }
+    public void RemoveStructure()
+    {
+        structureModel = null;
+        isTaken = false;
     }
 }

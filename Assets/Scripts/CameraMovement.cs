@@ -1,45 +1,55 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace CityBuilder
+public class CameraMovement : MonoBehaviour
 {
-    public class CameraMovement : MonoBehaviour
+    Vector3? basePointerPosition = null;
+    public float cameraMovementSpeed = 0.05f;
+    private int cameraXMin, cameraXMax, cameraZMin, cameraZMax;
+    // Start is called before the first frame update
+    void Start()
     {
-        private Vector3? _basePointerPosition = null;
-        public float cameraMovementSpeed = .05f;
-        private int _cameraXMin;
-        private int _cameraZMin;
-        private int _cameraXMax;
-        private int _cameraZMax;
-
-        public void MoveCamera(Vector3 pointerPosition)
-        {
-            if (_basePointerPosition.HasValue == false)
-                _basePointerPosition = pointerPosition;
-
-            Vector3 newPosition = pointerPosition - _basePointerPosition.Value;
-            newPosition = new Vector3(newPosition.x, 0, newPosition.y);
-            transform.Translate(newPosition * cameraMovementSpeed);
-
-            LimitPositionInsideCameraBounds();
-        }
         
-        private void LimitPositionInsideCameraBounds()
-        {
-            var transformPosition = transform.position;
-            transformPosition = new Vector3(Mathf.Clamp(transformPosition.x, _cameraXMin, _cameraXMax), 0,
-                Mathf.Clamp(transformPosition.z, _cameraZMin, _cameraZMax));
-            transform.position = transformPosition;
-        }
+    }
 
-        public void StopCameraMovement() => _basePointerPosition = null;
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 
-        public void SetCameraLimit(int cameraXMin, int cameraXMax, int cameraZMin, int cameraZMax)
+    public void MoveCamera(Vector3 pointerposition)
+    {
+        if (basePointerPosition.HasValue == false)
         {
-            _cameraXMin = cameraXMin;
-            _cameraXMax = cameraXMax;
-            _cameraZMin = cameraZMin;
-            _cameraZMax = cameraZMax;
+            basePointerPosition = pointerposition;
         }
+        Vector3 newPosition = pointerposition - basePointerPosition.Value;
+        newPosition = new Vector3(newPosition.x, 0, newPosition.y);
+        transform.Translate(newPosition * cameraMovementSpeed);
+        LimitPositionInsideCameraBounds();
+    }
+
+    private void LimitPositionInsideCameraBounds()
+    {
+        transform.position = new Vector3(
+                    Mathf.Clamp(transform.position.x, cameraXMin, cameraXMax),
+                    0,
+                    Mathf.Clamp(transform.position.z, cameraZMin, cameraZMax)
+                    );
+    }
+
+    public void StopCameraMovement()
+    {
+        basePointerPosition = null;
+    }
+
+    public void SetCameraLimits(int cameraXMin, int cameraXMax, int cameraZMin, int cameraZMax)
+    {
+        this.cameraXMax = cameraXMax;
+        this.cameraXMin = cameraXMin;
+        this.cameraZMax = cameraZMax;
+        this.cameraZMin = cameraZMin;
     }
 }

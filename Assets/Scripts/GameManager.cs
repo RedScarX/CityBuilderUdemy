@@ -1,68 +1,112 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace CityBuilder
+public class GameManager : MonoBehaviour
 {
-    public class GameManager : MonoBehaviour
+    public PlacementManager placementManager;
+    public IInputManager inputManager;
+    public UiController uiController;
+    public int width, length;
+    public CameraMovement cameraMovement;
+    public LayerMask inputMask;
+    private BuildingManager buildingManager;
+    private int cellSize = 3;
+
+    private PlayerState state;
+
+    public PlayerSelectionState selectionState;
+    public PlayerBuildingSingleStructureState buildingSingleStructureState;
+    public PlayerRemoveBuildingState demolishState;
+
+    public PlayerState State { get => state; }
+
+    private void Awake()
     {
-        private IInputManager _inputManager;
+        buildingManager = new BuildingManager(cellSize, width, length, placementManager);
+        selectionState = new PlayerSelectionState(this, cameraMovement);
+        buildingSingleStructureState = new PlayerBuildingSingleStructureState(this, buildingManager);
+        demolishState = new PlayerRemoveBuildingState(this, buildingManager);
+        state = selectionState;
+        state.EnterState();
+#if (UNITY_EDITOR && TEST) || !(UNITY_IOS || UNITY_ANDROID)
+        inputManager = gameObject.AddComponent<InputManager>();
+#endif
+#if (UNITY_IOS || UNITY_ANDROID)
 
-        [SerializeField] private UIController uiController;
-        [SerializeField] private CameraMovement cameraMovement;
-
-        private PlayerState _playerState;
-        private GridStructure _gridStructure;
-        
-        
-        [SerializeField] private int width;
-        [SerializeField] private int length;
-
-        private const float CellSize = 3;
-        private bool _buildingModeActive = false;
-
-        private void Start()
-        {
-            cameraMovement.SetCameraLimit(0, width, 0, length);
-            _inputManager = FindObjectsOfType<MonoBehaviour>().OfType<IInputManager>().FirstOrDefault();
-            _inputManager?.AddListenerOnPointerDownEvent(HandleInput);
-            _inputManager?.AddListenerOnPointerChangeEvent(HandlePointerChange);
-            _inputManager?.AddListenerOnPointerSecondChangeEvent(HandleInputCameraPanning);
-            _inputManager?.AddListenerOnPointerSecondUpEvent(HandleInputCameraPanStop);
-            uiController.AddListenerBuildAreaEvent(StartPlacementMode);
-            uiController.AddListenerCancelActionEvent(CancelAction);
-            
-        }
-
-
-        private void OnDestroy()
-        {
-            _inputManager?.RemoveListenerOnPointerDownEvent(HandleInput); 
-            _inputManager?.RemoveListenerOnPointerSecondChangeEvent(HandleInputCameraPanning);
-            _inputManager?.RemoveListenerOnPointerSecondUpEvent(HandleInputCameraPanStop);
-            uiController.RemoveListenerBuildAreaEvent(StartPlacementMode);
-            uiController.RemoveListenerCancelActionEvent(CancelAction);
-        }
-
-        private void HandleInput(Vector3 position)
-        {
-        }
-
-        private void StartPlacementMode() => _buildingModeActive = true;
-        private void CancelAction() => _buildingModeActive = false;
-
-        private void HandleInputCameraPanStop()
-        {
-        }
-
-        private void HandlePointerChange(Vector3 obj)
-        {
-            Debug.Log($"{obj}");
-        }
-
-        private void HandleInputCameraPanning(Vector3 position)
-        {
-        }
+#endif
     }
+    void Start()
+    {
+        PreapreGameComponents();
+        //inputManager = FindObjectsOfType<MonoBehaviour>().OfType<IInputManager>().FirstOrDefault();
+
+        AssignInputListeners();
+        AssignUiControllerListeners();
+    }
+
+    private void PreapreGameComponents()
+    {
+        inputManager.MouseInputMask = inputMask;
+        cameraMovement.SetCameraLimits(0, width, 0, length);
+    }
+
+    private void AssignInputListeners()
+    {
+        inputManager.AddListenerOnPointerDownEvent(HandleInput);
+        inputManager.AddListenerOnPointerSecondDownEvent(HandleInputCameraPan);
+        inputManager.AddListenerOnPointerSecondUpEvent(HandleInputCameraStop);
+        inputManager.AddListenerOnPointerChangeEvent(HandlePointerChange);
+    }
+
+    private void AssignUiControllerListeners()
+    {
+        uiController.AddListenerOnBuildAreaEvent(StartPlacementMode);
+        uiController.AddListenerOnCancleActionEvent(CancelAction);
+        uiController.AddListenerOnDemolishActionEvent(StartDemolishMode);
+    }
+
+    private void StartDemolishMode()
+    {
+        TransitionToState(demolishState);
+    }
+
+    private void HandlePointerChange(Vector3 position)
+    {
+        state.OnInputPointerChange(position);
+    }
+
+    private void HandleInputCameraStop()
+    {
+        state.OnInputPanUp();
+    }
+
+    private void HandleInputCameraPan(Vector3 position)
+    {
+        state.OnInputPanChange(position);
+    }
+
+    private void HandleInput(Vector3 position)
+    {
+        state.OnInputPointerDown(position);
+
+    }
+
+    private void StartPlacementMode()
+    {
+        TransitionToState(buildingSingleStructureState);
+    }
+
+    private void CancelAction()
+    {
+        state.OnCancle();
+    }
+    public void TransitionToState(PlayerState newState)
+    {
+        this.state = newState;
+        this.state.EnterState();
+    }
+
 }

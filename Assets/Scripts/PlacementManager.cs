@@ -1,15 +1,26 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace CityBuilder 
+public class PlacementManager : MonoBehaviour
 {
-    public class PlacementManager : MonoBehaviour
-    { 
-        [SerializeField] private GameObject buildingPrefab;
-        [SerializeField] private Transform groundParent;
-        public void CreateBuilding(Vector3 gridPosition, GridStructure structure)
+    public GameObject buildingPrefab;
+    public Transform ground;
+
+    public void CreateBuilding(Vector3 gridPosition, GridStructure grid)
+    {
+        GameObject newStructure = Instantiate(buildingPrefab, ground.position + gridPosition, Quaternion.identity);
+        grid.PlaceStructureOnTheGrid(newStructure, gridPosition);
+    }
+
+    public void RemoveBuilding(Vector3 gridPosition, GridStructure grid)
+    {
+        var structure = grid.GetStructureFromTheGrid(gridPosition);
+        if (structure != null)
         {
-            var newStructure = Instantiate(buildingPrefab, groundParent.position+gridPosition, Quaternion.identity);
-            structure.PlaceStructureOnTheGrid(newStructure,gridPosition);
+            Destroy(structure);
+            grid.RemoveStructureFromTheGrid(gridPosition);
         }
     }
 }

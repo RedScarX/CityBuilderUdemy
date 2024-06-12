@@ -1,41 +1,87 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CityBuilder
+public class UiController : MonoBehaviour
 {
-    public class UIController : MonoBehaviour
+    private Action OnBuildAreaHandler;
+    private Action OnCancleActionHandler;
+    private Action OnDemolishActionHandler;
+
+    public Button buildResidentialAreaBtn;
+    public Button cancleActionBtn;
+    public GameObject cancleActionPanel;
+
+    public GameObject buildingMenuPanel;
+    public Button openBuildMenuBtn;
+    public Button demolishBtn;
+
+    // Start is called before the first frame update
+    void Start()
     {
-        [SerializeField] private Button buildResidentialAreaBuildingBtn;
-        [SerializeField] private Button cancelActionBtn;
-        [SerializeField] private GameObject cancelActionPanel;
-        
-        private Action _onBuildAreaHandler;
-        private Action _onCancelActionHandler;
+        cancleActionPanel.SetActive(false);
+        buildingMenuPanel.SetActive(false);
+        buildResidentialAreaBtn.onClick.AddListener(OnBuildAreaCallback);
+        cancleActionBtn.onClick.AddListener(OnCancleActionCallback);
+        openBuildMenuBtn.onClick.AddListener(OnOpenBuildMenu);
+        demolishBtn.onClick.AddListener(OnDemolishHandler);
 
-        private void Start()
-        {
-            buildResidentialAreaBuildingBtn.onClick.AddListener(OnBuildAreaCallback); 
-            cancelActionBtn.onClick.AddListener(OnCancelActionCallback);
-        }
+    }
 
-        private void OnBuildAreaCallback()
-        {
-            cancelActionPanel.SetActive(true);
-            _onBuildAreaHandler?.Invoke();
-        }
-        private void OnCancelActionCallback()
-        {
-            cancelActionPanel.SetActive(false);
-            _onCancelActionHandler?.Invoke();
-        }
+    private void OnDemolishHandler()
+    {
+        OnDemolishActionHandler?.Invoke();
+        cancleActionPanel.SetActive(true);
+        buildingMenuPanel.SetActive(false);
+    }
 
-        public void AddListenerBuildAreaEvent(Action listener) => _onBuildAreaHandler += listener;
-        public void RemoveListenerBuildAreaEvent(Action listener) => _onBuildAreaHandler -= listener;
+    private void OnOpenBuildMenu()
+    {
+        buildingMenuPanel.SetActive(true);
+    }
 
-        public void AddListenerCancelActionEvent(Action listener) => _onCancelActionHandler += listener;
-        public void RemoveListenerCancelActionEvent(Action listener) => _onCancelActionHandler -= listener;
+    private void OnBuildAreaCallback()
+    {
+        cancleActionPanel.SetActive(true);
+        buildingMenuPanel.SetActive(false);
+        OnBuildAreaHandler?.Invoke();
+    }
 
+    private void OnCancleActionCallback()
+    {
+        cancleActionPanel.SetActive(false);
+        OnCancleActionHandler?.Invoke();
+    }
 
+    public void AddListenerOnBuildAreaEvent(Action listener)
+    {
+        OnBuildAreaHandler += listener;
+    }
+
+    public void RemoveListenerOnBuildAreaEvent(Action listener)
+    {
+        OnBuildAreaHandler -= listener;
+    }
+    public void AddListenerOnCancleActionEvent(Action listener)
+    {
+        OnCancleActionHandler += listener;
+    }
+
+    public void RemoveListenerOnCancleActionEvent(Action listener)
+    {
+        OnCancleActionHandler -= listener;
+    }
+
+    public void AddListenerOnDemolishActionEvent(Action listener)
+    {
+        OnDemolishActionHandler += listener;
+    }
+
+    public void RemoveListenerOnDemolishActionEvent(Action listener)
+    {
+        OnDemolishActionHandler -= listener;
     }
 }

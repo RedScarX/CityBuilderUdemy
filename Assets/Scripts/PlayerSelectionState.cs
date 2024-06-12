@@ -1,39 +1,41 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace CityBuilder
+public class PlayerSelectionState : PlayerState
 {
-    public class PlayerSelectionState : PlayerState
+    CameraMovement cameraMovement;
+    public PlayerSelectionState(GameManager gameManager, CameraMovement cameraMovement) : base(gameManager)
     {
-        private CameraMovement _cameraMovement;
-        public PlayerSelectionState(GameManager gameManager, CameraMovement cameraMovement) : base(gameManager)
-        {
-            _cameraMovement = cameraMovement;
-        }
+        this.cameraMovement = cameraMovement;
+    }
+    public override void OnInputPanChange(Vector3 panPosition)
+    {
+        cameraMovement.MoveCamera(panPosition);
+    }
 
-        public override void OnInputPointerDown(Vector3 position)
-        {
-        }
+    public override void OnInputPanUp()
+    {
+        cameraMovement.StopCameraMovement();
+    }
 
-        public override void OnInputPointerChange(Vector3 position)
-        {
-        }
+    public override void OnInputPointerChange(Vector3 position)
+    {
+        return;
+    }
 
-        public override void OnInputPanChange(Vector3 position)
-        {
-            _cameraMovement.MoveCamera(position);
-        }
+    public override void OnInputPointerDown(Vector3 position)
+    {
+        return;
+    }
 
-        public override void OnInputPanUpChange()
-        {
-            _cameraMovement.StopCameraMovement();
-        }
+    public override void OnInputPointerUp()
+    {
+        return;
+    }
 
-        public override void OnInputPointerUp()
-        {
-        }
-
-        public override void Cancel()
-        {
-        }
+    public override void OnCancle()
+    {
+        return;
     }
 }
